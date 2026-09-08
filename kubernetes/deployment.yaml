@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tigergate-test-rust
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: tigergate-test-rust }
+  template:
+    metadata:
+      labels: { app: tigergate-test-rust }
+    spec:
+      containers:
+        - name: app
+          image: tigergate-test-rust:latest
