@@ -1,0 +1,37 @@
+# DELIBERATELY INSECURE RBAC — IaC scanner fixture.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tigergate-admin
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tigergate-everything
+rules:
+  - apiGroups: ["*"]          # wildcard on everything
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["secrets"]    # secret read access
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]  # exec into pods
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tigergate-admin-binding
+subjects:
+  - kind: ServiceAccount
+    name: tigergate-admin
+    namespace: default
+  - kind: Group
+    name: system:anonymous    # anonymous users bound to cluster-admin
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io

@@ -1,8 +1,13 @@
 name: Test
 on: [push, pull_request]
+
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "Add rust test command here"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --locked

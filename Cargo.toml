@@ -2,6 +2,36 @@
 name = "tigergate-test-rust"
 version = "0.1.0"
 edition = "2021"
+description = "Deliberately vulnerable fixture for SCA / SAST / secrets / IaC / SBOM scanner validation. DO NOT DEPLOY."
+license = "MIT"
+publish = false
 
+[lib]
+name = "tigergate_test_rust"
+path = "src/lib.rs"
+
+[[bin]]
+name = "tigergate-test-rust"
+path = "src/main.rs"
+
+# ---------------------------------------------------------------------------
+# SCA FIXTURES: every pin below is deliberately outdated and has a published
+# RustSec advisory. Exact "=" pins stop cargo from resolving to a fixed release.
+# ---------------------------------------------------------------------------
 [dependencies]
-time = "=0.1.43" # Deliberately outdated SCA fixture.
+time = "=0.1.43"            # RUSTSEC-2020-0071 / CVE-2020-26235 (segfault in localtime_r)
+chrono = "=0.4.19"          # RUSTSEC-2020-0159 (localtime_r unsoundness)
+smallvec = "=0.6.13"        # RUSTSEC-2021-0003 / CVE-2021-25900 (buffer overflow in insert_many), RUSTSEC-2019-0009, RUSTSEC-2019-0012
+regex = "=1.5.4"            # RUSTSEC-2022-0013 / CVE-2022-24713 (ReDoS on untrusted regex)
+tokio = { version = "=1.8.0", features = ["rt-multi-thread", "macros", "net", "io-util"] } # RUSTSEC-2021-0072, RUSTSEC-2021-0124
+hyper = { version = "=0.14.9", features = ["server", "http1", "tcp"] }                    # RUSTSEC-2021-0078, RUSTSEC-2021-0079
+tar = "=0.4.35"             # RUSTSEC-2021-0080 / CVE-2021-38511 (directory traversal)
+base64 = "=0.5.1"           # RUSTSEC-2017-0004 / CVE-2017-1000430 (integer overflow)
+rusqlite = { version = "=0.25.4", features = ["bundled"] } # libsqlite3-sys: RUSTSEC-2022-0090 (CVE-2022-35737)
+openssl = "=0.10.45"        # RUSTSEC-2023-0022/0023/0024, RUSTSEC-2025-0004
+# Support crates used by the SAST fixtures (weak hashes, randomness, JSON).
+md5 = "0.7"
+sha1 = "0.10"
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

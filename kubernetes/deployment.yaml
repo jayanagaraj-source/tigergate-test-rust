@@ -1,7 +1,9 @@
+# DELIBERATELY INSECURE Kubernetes manifests — IaC scanner fixture. Do not apply.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tigergate-test-rust
+  namespace: default                       # workload in default namespace
 spec:
   replicas: 1
   selector:
@@ -10,13 +12,40 @@ spec:
     metadata:
       labels: { app: tigergate-test-rust }
     spec:
-      hostNetwork: true # Deliberately insecure IaC fixture.
+      hostNetwork: true                    # host network
+      hostPID: true                        # host PID
+      hostIPC: true                        # host IPC
+      automountServiceAccountToken: true
+      serviceAccountName: tigergate-admin
       containers:
         - name: app
-          image: tigergate-test-rust:latest
+          image: tigergate-test-rust:latest          # latest tag
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+            - containerPort: 22
+              hostPort: 2222                          # hostPort
           securityContext:
             privileged: true
-            runAsUser: 0
+            allowPrivilegeEscalation: true
+            runAsUser: 0                              # root
+            readOnlyRootFilesystem: false
+            capabilities:
+              add: ["SYS_ADMIN", "NET_ADMIN", "NET_RAW"]
+          # No resources.limits / requests
+          # No liveness/readiness probes
           env:
             - name: DATABASE_PASSWORD
-              value: "fixture-password-not-real"
+              value: "fixture-password-not-real"      # secret in plain env
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "3Coz+MovgjNj1uL6NuH1bQXMepPUbVAHst29Y+7Q"
+          volumeMounts:
+            - name: host-root
+              mountPath: /host
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+      volumes:
+        - name: host-root
+          hostPath: { path: / }                       # hostPath
+        - name: docker-sock
+          hostPath: { path: /var/run/docker.sock }    # docker socket

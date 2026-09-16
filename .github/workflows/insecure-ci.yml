@@ -1,0 +1,28 @@
+# DELIBERATELY INSECURE GitHub Actions workflow — CI/CD scanner fixture.
+# Manual trigger only, so it never runs by accident on push/PR.
+name: Insecure CI fixture
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "untrusted text"
+        required: false
+
+permissions: write-all                     # over-privileged GITHUB_TOKEN
+
+env:
+  AWS_ACCESS_KEY_ID: AKIAYD5G4M2JC5KLREOA  # SECRET in workflow
+  AWS_SECRET_ACCESS_KEY: 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
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master      # unpinned action (mutable ref)
+        with:
+          persist-credentials: true
+      - uses: some-org/unverified-action@main   # third-party action, not SHA-pinned
+      # Script injection: untrusted input expanded directly into shell.
+      - run: echo "Building ${{ github.event.inputs.title }} ${{ github.head_ref }}"
+      - run: curl -sSL http://example.com/install.sh | bash
+      - run: echo "::set-env name=PATH::/tmp/evil:$PATH"

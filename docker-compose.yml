@@ -1,3 +1,35 @@
+# DELIBERATELY INSECURE docker-compose — IaC scanner fixture. Do not run in production.
 services:
   app:
     build: .
+    image: tigergate-test-rust:latest
+    privileged: true                      # IaC: privileged container
+    network_mode: host                    # IaC: host networking
+    pid: host                             # IaC: host PID namespace
+    user: root
+    cap_add:
+      - ALL                               # IaC: all Linux capabilities
+    security_opt:
+      - seccomp:unconfined                # IaC: seccomp disabled
+      - apparmor:unconfined
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # IaC: Docker socket mounted
+      - /:/host                                     # IaC: host root filesystem mounted
+    environment:
+      DATABASE_URL: postgres://app_admin:YD1BE4nRNpELLvMz9Arn@db:5432/orders
+      AWS_SECRET_ACCESS_KEY: 3Coz+MovgjNj1uL6NuH1bQXMepPUbVAHst29Y+7Q
+
+  db:
+    image: postgres:9.6                   # SCA: end-of-life database image
+    ports:
+      - "0.0.0.0:5432:5432"               # IaC: database exposed on all interfaces
+    environment:
+      POSTGRES_USER: app_admin
+      POSTGRES_PASSWORD: YD1BE4nRNpELLvMz9Arn
+      POSTGRES_HOST_AUTH_METHOD: trust    # IaC: authentication disabled
+
+  cache:
+    image: redis:5.0.0                    # SCA: outdated image with known CVEs
+    command: ["redis-server", "--protected-mode", "no"]
+    ports:
+      - "6379:6379"

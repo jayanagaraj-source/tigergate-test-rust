@@ -1,0 +1,19 @@
+# SECRET-SCANNING FIXTURE — fake credentials.
+server:
+  port: 8080
+  bind: 0.0.0.0
+database:
+  host: prod-db.tigergate.internal
+  username: app_admin
+  password: YD1BE4nRNpELLvMz9Arn
+mail:
+  smtp_host: smtp.sendgrid.net
+  smtp_user: apikey
+  smtp_password: Sup3rS3cretSmtpP@ssw0rd
+integrations:
+  gitlab_token: glpat-A_O9wgiAiibeoQFAvElf
+  google_api_key: AIzaPeDVDQrJ8oOVIpAsoAoHdahmP3BfTh35CdN
+  twilio_account_sid: AC1dd646a59245a02f19f3e95f176e2e60
+  twilio_api_key: SK12bc15779a8a4a524d9b096eeb8dd6a9
+  mailgun_api_key: key-05fcbd5ea828f80a330026d0d33e200b
+  azure_storage: DefaultEndpointsProtocol=https;AccountName=tigergatefixture;AccountKey=6B9GfSgdlfUyAnfF0jVbd3I27wuVRMy7BADKq0x3HNGDgnIvi4ubx+Ki1DaCJlt0XJJ3G1ZG4Y/KWzjU4vBcGA==;EndpointSuffix=core.windows.net

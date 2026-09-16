@@ -1,0 +1,6 @@
+{
+  "auths": {
+    "https://index.docker.io/v1/": { "auth": "ZGVwbG95LWJvdDpEb2NrM3JIdWJQNHNzdzByZCE=" },
+    "registry.tigergate.internal": { "username": "ci", "password": "Regi5tryP4ss-fixture-9x" }
+  }
+}

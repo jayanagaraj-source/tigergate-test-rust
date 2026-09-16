@@ -1,0 +1,35 @@
+# DELIBERATELY INSECURE Service/Ingress — IaC scanner fixture.
+apiVersion: v1
+kind: Service
+metadata:
+  name: tigergate-test-rust
+  namespace: default
+spec:
+  type: LoadBalancer            # publicly exposed
+  loadBalancerSourceRanges: ["0.0.0.0/0"]
+  selector: { app: tigergate-test-rust }
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: ssh
+      port: 22
+      targetPort: 22
+      nodePort: 30022
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tigergate-test-rust
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"   # plain HTTP allowed
+spec:
+  rules:
+    - host: tigergate.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: tigergate-test-rust, port: { number: 80 } }
